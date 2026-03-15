@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de O.S. - FTTH</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📋</text></svg>">
+    <style>
+        /* Variáveis para o Tema Claro (Padrão) */
+        :root {
+            --bg-color: #f4f7f6;
+            --container-bg: #ffffff;
+            --text-color: #333333;
+            --border-color: #cccccc;
+            --primary-color: #0056b3;
+            --primary-hover: #004494;
+            --input-bg: #ffffff;
+            --textarea-bg: #fafafa;
+            --placeholder-color: #888888;
+        }
+
+        /* Variáveis para o Tema Escuro (Automático) */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #121212;
+                --container-bg: #1e1e1e;
+                --text-color: #e0e0e0;
+                --border-color: #444444;
+                --primary-color: #3a86ff;
+                --primary-hover: #256ce1;
+                --input-bg: #2a2a2a;
+                --textarea-bg: #222222;
+                --placeholder-color: #999999;
+            }
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            position: relative; 
+            background-color: var(--container-bg);
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            max-width: 1300px;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+
+        h2 {
+            margin-top: 0;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 5px;
+            padding-right: 40px; 
+        }
+
+        /* Botão de Limpar Formulário */
+        .clear-btn {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: var(--placeholder-color);
+            transition: transform 0.2s, filter 0.2s;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .clear-btn:hover {
+            transform: scale(1.1);
+            filter: brightness(0.8);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        /* CSS AJUSTADO PARA ALTURA EXATA */
+        .form-group input, 
+        .form-group select {
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1em;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            font-family: inherit;
+            box-sizing: border-box; /* Garante que padding não aumente o tamanho */
+            height: 38px; /* Força a altura exata em todos os elementos */
+            transition: border-color 0.3s, background-color 0.3s, color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 4px rgba(58, 134, 255, 0.4);
+        }
+
+        ::placeholder {
+            color: var(--placeholder-color);
+            opacity: 1;
+        }
+
+        select:invalid {
+            color: var(--placeholder-color);
+        }
+        
+        select option {
+            color: var(--text-color);
+        }
+
+        /* Grid Layouts do Cliente com alinhamento refinado */
+        .grid-row-1 {
+            display: grid;
+            grid-template-columns: 3.3fr 2.2fr 0.5fr;
+            gap: 15px;
+        }
+
+        .grid-row-2 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .grid-row-3 {
+            display: grid;
+            grid-template-columns: 41fr 20fr 20fr;
+            gap: 15px;
+        }
+
+        /* Grid Layouts da O.S. */
+        .grid-2-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .grid-3-col {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .grid-4-col {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        /* Container especial para botões embutidos no input */
+        .input-with-icon {
+            position: relative;
+            display: flex;
+            align-items: center;
+            height: 38px; /* Ajustado para acompanhar o input */
+        }
+
+        .input-with-icon input[type="text"] {
+            width: 100%;
+            padding-right: 40px;
+            box-sizing: border-box;
+            height: 100%; /* Herda os 38px */
+        }
+
+        .input-with-icon input[type="date"] {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 40px;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+
+        .input-with-icon .static-icon {
+            position: absolute;
+            right: 12px;
+            pointer-events: none;
+            color: var(--placeholder-color);
+            font-size: 1.2em;
+        }
+
+        .input-with-icon .action-btn {
+            position: absolute;
+            right: 5px;
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            font-size: 1.2em;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            margin: 0;
+            transition: transform 0.3s ease, color 0.3s;
+        }
+
+        .input-with-icon .action-btn:hover {
+            color: var(--primary-hover);
+            transform: rotate(180deg);
+            background-color: transparent;
+        }
+
+        .output-section {
+            margin-top: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 580px; 
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+            resize: vertical;
+            box-sizing: border-box;
+            background-color: var(--textarea-bg);
+            color: var(--text-color);
+            transition: border-color 0.3s, background-color 0.3s, color 0.3s;
+        }
+
+        .btn-copy {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            margin-top: 10px;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+
+        .btn-copy:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* Responsividade para telas menores */
+        @media (max-width: 768px) {
+            .grid-row-1, .grid-row-2, .grid-row-3, .grid-3-col, .grid-4-col, .grid-2-col {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <button id="btn_limpar" class="clear-btn" title="Limpar todos os campos">🗑️</button>
+    
+    <h2>Dados do Cliente</h2>
+    
+    <div class="grid-row-1">
+        <div class="form-group">
+            <label for="nome">Nome do Cliente</label>
+            <input type="text" id="nome" class="auto-update" placeholder="Ex: 37028 - John Smith">
+        </div>
+        <div class="form-group">
+            <label for="endereco">Endereço</label>
+            <input type="text" id="endereco" class="auto-update" placeholder="Rua das Flores">
+        </div>
+        <div class="form-group">
+            <label for="numero">Número</label>
+            <input type="text" id="numero" class="auto-update" placeholder="123">
+        </div>
+    </div>
+
+    <div class="grid-row-2">
+        <div class="form-group">
+            <label for="bairro">Bairro</label>
+            <input type="text" id="bairro" class="auto-update" placeholder="Centro">
+        </div>
+        <div class="form-group">
+            <label for="cidade">Cidade</label>
+            <input type="text" id="cidade" class="auto-update" placeholder="Balneário Piçarras">
+        </div>
+        <div class="form-group">
+            <label for="complemento">Complemento</label>
+            <input type="text" id="complemento" class="auto-update" placeholder="Sala Comercial">
+        </div>
+        <div class="form-group">
+            <label for="referencia">Ponto de Referência</label>
+            <input type="text" id="referencia" class="auto-update" placeholder="Próximo ao cartório">
+        </div>
+    </div>
+
+    <div class="grid-row-3">
+        <div class="form-group">
+            <label for="condominio">Condomínio</label>
+            <input type="text" id="condominio" class="auto-update" placeholder="Residencial das Águas">
+        </div>
+        <div class="form-group">
+            <label for="bloco">Bloco</label>
+            <input type="text" id="bloco" class="auto-update" placeholder="B">
+        </div>
+        <div class="form-group">
+            <label for="apartamento">Apartamento</label>
+            <input type="text" id="apartamento" class="auto-update" placeholder="204">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="coordenadas_cliente">Coordenadas do Cliente (URL Maps)</label>
+        <input type="text" id="coordenadas_cliente" class="auto-update" placeholder="https://maps.google.com/...">
+    </div>
+
+    <h2>Detalhes da O.S.</h2>
+
+    <div class="grid-4-col">
+        <div class="form-group">
+            <label for="id_os">ID da O.S.</label>
+            <input type="text" id="id_os" class="auto-update" placeholder="OS 902647">
+        </div>
+        <div class="form-group">
+            <label for="id_atendimento">ID do Atendimento</label>
+            <input type="text" id="id_atendimento" class="auto-update" placeholder="AT-112233">
+        </div>
+        <div class="form-group">
+            <label for="modalidade">Modalidade</label>
+            <select id="modalidade" class="auto-update" required>
+                <option value="" disabled selected hidden>Selecione...</option>
+                <option value="PROJETO AI">PROJETO AI</option>
+                <option value="PROCEDIMENTO N1">PROCEDIMENTO N1</option>
+                <option value="PROCEDIMENTO N2">PROCEDIMENTO N2</option>
+                <option value="CORREÇÃO">CORREÇÃO</option>
+                <option value="READEQUAÇÃO">READEQUAÇÃO</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="data_os">Data</label>
+            <div class="input-with-icon">
+                <input type="text" id="data_os" class="auto-update" placeholder="DD/MM/AAAA">
+                <span class="static-icon">📅</span>
+                <input type="date" id="data_picker">
+            </div>
+        </div>
+    </div>
+
+    <div class="grid-3-col">
+        <div class="form-group">
+            <label for="ce">CE (Caixa)</label>
+            <input type="text" id="ce" class="auto-update" placeholder="CE-505">
+        </div>
+        <div class="form-group">
+            <label for="splitter">Splitter</label>
+            <input type="text" id="splitter" class="auto-update" placeholder="1/8">
+        </div>
+        <div class="form-group">
+            <label for="porta">Porta</label>
+            <input type="text" id="porta" class="auto-update" placeholder="Livre">
+        </div>
+    </div>
+
+    <div class="grid-3-col">
+        <div class="form-group">
+            <label for="metragem">Metragem do Drop (m)</label>
+            <input type="text" id="metragem" class="auto-update" placeholder="40">
+        </div>
+        <div class="form-group">
+            <label for="cordoalha">Cordoalhas</label>
+            <input type="text" id="cordoalha" class="auto-update" placeholder="0">
+        </div>
+        <div class="form-group">
+            <label for="reaproveitamento">Reaproveitamento de Drop</label>
+            <div class="input-with-icon">
+                <input type="text" id="reaproveitamento" class="auto-update" placeholder="Não">
+                <button type="button" id="btn_reaproveitamento" class="action-btn" title="Alternar Sim/Não">🔄</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="coordenadas_os">Coordenadas do Equipamento/Caixa (URL Maps)</label>
+        <input type="text" id="coordenadas_os" class="auto-update" placeholder="https://maps.google.com/...">
+    </div>
+
+    <div class="output-section">
+        <h2>Texto Gerado</h2>
+        <textarea id="texto_gerado" readonly></textarea>
+        <button class="btn-copy" onclick="copiarTexto()">Copiar Texto da O.S.</button>
+    </div>
+</div>
+
+<script>
+    const inputs = document.querySelectorAll('.auto-update');
+    const textarea = document.getElementById('texto_gerado');
+    const dataPicker = document.getElementById('data_picker');
+    const dataTexto = document.getElementById('data_os');
+    const btnReaproveitamento = document.getElementById('btn_reaproveitamento');
+    const inputReaproveitamento = document.getElementById('reaproveitamento');
+    const btnLimpar = document.getElementById('btn_limpar');
+
+    // Estado do placeholder de Reaproveitamento
+    let stateReaproveitamento = 'Não';
+
+    // === LÓGICA DE LOCALSTORAGE ===
+    const storageKey = 'gerador_os_ftth_dados';
+
+    function salvarDados() {
+        const dadosSalvos = {};
+        inputs.forEach(input => {
+            dadosSalvos[input.id] = input.value;
+        });
+        dadosSalvos['stateReaproveitamento'] = stateReaproveitamento;
+        localStorage.setItem(storageKey, JSON.stringify(dadosSalvos));
+    }
+
+    function carregarDados() {
+        const dadosSalvos = JSON.parse(localStorage.getItem(storageKey));
+        if (dadosSalvos) {
+            inputs.forEach(input => {
+                if (dadosSalvos[input.id] !== undefined) {
+                    input.value = dadosSalvos[input.id];
+                }
+            });
+            if (dadosSalvos['stateReaproveitamento']) {
+                stateReaproveitamento = dadosSalvos['stateReaproveitamento'];
+                inputReaproveitamento.placeholder = stateReaproveitamento;
+            }
+        }
+    }
+
+    // === LÓGICA DE INTERAÇÃO DOS CAMPOS ===
+    btnReaproveitamento.addEventListener('click', function() {
+        stateReaproveitamento = stateReaproveitamento === 'Não' ? 'Sim' : 'Não';
+        inputReaproveitamento.placeholder = stateReaproveitamento;
+        atualizarTexto();
+    });
+
+    dataPicker.addEventListener('change', function() {
+        if (this.value) {
+            const partes = this.value.split('-');
+            if (partes.length === 3) {
+                dataTexto.value = `${partes[2]}/${partes[1]}/${partes[0]}`;
+                atualizarTexto(); 
+            }
+        }
+    });
+
+    // === LÓGICA DE LIMPAR DADOS ===
+    btnLimpar.addEventListener('click', function() {
+        inputs.forEach(input => input.value = '');
+        stateReaproveitamento = 'Não';
+        inputReaproveitamento.placeholder = stateReaproveitamento;
+        localStorage.removeItem(storageKey);
+        atualizarTexto();
+    });
+
+    // === GERADOR DE TEXTO ===
+    function atualizarTexto() {
+        const dados = {
+            nome: document.getElementById('nome').value || '[Nome]',
+            endereco: document.getElementById('endereco').value || '[Endereço]',
+            numero: document.getElementById('numero').value || '[S/N]',
+            bairro: document.getElementById('bairro').value || '[Bairro]',
+            cidade: document.getElementById('cidade').value || '[Cidade]',
+            coordenadas_cliente: document.getElementById('coordenadas_cliente').value || '[Sem URL]',
+            
+            id_os: document.getElementById('id_os').value || '[N/A]',
+            id_atendimento: document.getElementById('id_atendimento').value || '[N/A]',
+            modalidade: document.getElementById('modalidade').value || '[Modalidade]',
+            data_os: document.getElementById('data_os').value || '[Data]',
+            
+            ce: document.getElementById('ce').value || '[N/A]',
+            splitter: document.getElementById('splitter').value || '[N/A]',
+            porta: document.getElementById('porta').value || 'Livre', 
+            
+            metragem: document.getElementById('metragem').value || '0',
+            cordoalha: document.getElementById('cordoalha').value || 'Nenhuma',
+            reaproveitamento: document.getElementById('reaproveitamento').value,
+            
+            coordenadas_os: document.getElementById('coordenadas_os').value || '[Sem URL]'
+        };
+
+        // Lógica de Condomínio
+        let condParts = [];
+        const valCondominio = document.getElementById('condominio').value.trim();
+        const valBloco = document.getElementById('bloco').value.trim();
+        const valApartamento = document.getElementById('apartamento').value.trim();
+        
+        if (valCondominio !== '') condParts.push(`Condomínio ${valCondominio}`);
+        if (valBloco !== '') condParts.push(`Bloco ${valBloco}`);
+        if (valApartamento !== '') condParts.push(`Apto ${valApartamento}`);
+
+        let condominioTxt = '';
+        if (condParts.length > 0) {
+            condominioTxt = `\nCondomínio: ` + condParts.join(' - ');
+        }
+
+        // Lógica de Complemento
+        let compParts = [];
+        const valComplemento = document.getElementById('complemento').value.trim();
+        const valReferencia = document.getElementById('referencia').value.trim();
+        
+        if (valComplemento !== '') compParts.push(`${valComplemento}`);
+        if (valReferencia !== '') compParts.push(`${valReferencia}`);
+
+        let complementoTxt = '';
+        if (compParts.length > 0) {
+            complementoTxt = `\nComplemento: ` + compParts.join(' - ');
+        }
+
+        // Lógica de Observações
+        let observacoesTxt = '';
+        if (stateReaproveitamento === 'Sim' || dados.reaproveitamento.trim() !== '') {
+            observacoesTxt = `\n\n📝 ** OBSERVAÇÕES IMPORTANTES **\n> POSSÍVEL REAPROVEITAMENTO DE CABO. AVALIAR INTEGRIDADE E CONFIRMAR IDENTIFICAÇÃO DO MESMO AO PROJETO.`;
+            if (dados.reaproveitamento.trim() !== '') {
+                observacoesTxt += `\n- Antigo Assinante: ${dados.reaproveitamento}`;
+            }
+        }
+
+        // Cálculo da metragem total com reserva
+        const metragemValor = parseInt(dados.metragem) || 0;
+        const metragemComReserva = metragemValor + 40;
+
+        // Data Atual no formato DD/MM/AAAA
+        const hoje = new Date();
+        const dia = String(hoje.getDate()).padStart(2, '0');
+        const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+        const ano = String(hoje.getFullYear()); 
+        const dataAtual = `${dia}/${mes}/${ano}`;
+
+        // Construção das linhas de resumo
+        const resumoProjeto = `${dados.cidade} - ${dados.nome} - ${dados.id_os} - ${dados.modalidade} - ${metragemComReserva} MTS - ${dataAtual}`.toUpperCase();
+        const resumoProcedimento = `${dados.id_os}	${dados.nome}	${dados.cidade}	${dados.bairro}	${dados.ce}	${dados.modalidade}	${dados.data_os}	${dataAtual}`.toUpperCase();
+
+        const template = `📋 ** PROJETO DE INSTALAÇÃO FTTH **
+Ordem de Serviço: ${dados.id_os} | Atendimento: ${dados.id_atendimento} | Data: ${dados.data_os} | Modalidade: ${dados.modalidade}
+
+👤 ** DADOS DO CLIENTE **
+Nome: ${dados.nome}
+Endereço: ${dados.endereco}, ${dados.numero}
+Localidade: ${dados.bairro} - ${dados.cidade}${condominioTxt}${complementoTxt}${observacoesTxt}
+
+🪜 ** DETALHES TÉCNICOS DE LANÇAMENTO **
+> LANÇAR CABO DROP ATÉ A CAIXA DESIGNADA CONFORME ROTA DEFINIDA NO MAPA EM ANEXO.
+- Metragem Estimada: ${dados.metragem} metros (Rota) + 40 metros (Reservas)
+- Ancoragens em Cordoalha: ${dados.cordoalha}
+- CE / Caixa de Atendimento: ${dados.ce}
+
+🧰 ** DETALHES TÉCNICOS DE ATIVAÇÃO **
+> REALIZAR FUSÃO NA PORTA DESIGNADA CONFORME DIAGRAMA EM ANEXO E IDENTIFICAR O TUBETE.
+- Splitter: ${dados.splitter}
+- Porta Designada: ${dados.porta}
+
+🔗 ** COORDENADAS GEOGRÁFICAS **
+- Localização da Caixa: ${dados.coordenadas_os}
+- Localização do Cliente: ${dados.coordenadas_cliente}
+
+${resumoProjeto}
+
+${resumoProcedimento}`;
+
+        textarea.value = template;
+        salvarDados();
+    }
+
+    inputs.forEach(input => {
+        input.addEventListener('input', atualizarTexto);
+        input.addEventListener('change', atualizarTexto);
+    });
+
+    function copiarTexto() {
+        textarea.select();
+        textarea.setSelectionRange(0, 99999);
+        navigator.clipboard.writeText(textarea.value).then(() => {
+            const btn = document.querySelector('.btn-copy');
+            const textoOriginal = btn.innerText;
+            btn.innerText = 'Copiado com sucesso!';
+            btn.style.backgroundColor = '#28a745';
+            
+            setTimeout(() => {
+                btn.innerText = textoOriginal;
+                btn.style.backgroundColor = 'var(--primary-color)';
+            }, 2000);
+        });
+    }
+
+    carregarDados();
+    atualizarTexto();
+</script>
+
+</body>
+</html>
