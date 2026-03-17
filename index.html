@@ -350,6 +350,7 @@
             <select id="modalidade" class="auto-update" required>
                 <option value="" disabled selected hidden>Selecione...</option>
                 <option value="PROJETO AI">PROJETO AI</option>
+                <option value="PROJETO N1 > AI">PROJETO N1 > AI</option>
                 <option value="PROCEDIMENTO N1">PROCEDIMENTO N1</option>
                 <option value="PROCEDIMENTO N2">PROCEDIMENTO N2</option>
                 <option value="CORREÇÃO">CORREÇÃO</option>
@@ -533,7 +534,7 @@
         // Lógica de Observações
         let observacoesTxt = '';
         if (stateReaproveitamento === 'Sim' || dados.reaproveitamento.trim() !== '') {
-            observacoesTxt = `\n\n📝 ** OBSERVAÇÕES IMPORTANTES **\n> POSSÍVEL REAPROVEITAMENTO DE CABO. AVALIAR INTEGRIDADE E CONFIRMAR IDENTIFICAÇÃO DO MESMO AO PROJETO.`;
+            observacoesTxt = `\n\n~ OBSERVAÇÕES IMPORTANTES ~\n> POSSÍVEL REAPROVEITAMENTO DE CABO. AVALIAR INTEGRIDADE E CONFIRMAR IDENTIFICAÇÃO DO MESMO AO PROJETO.`;
             if (dados.reaproveitamento.trim() !== '') {
                 observacoesTxt += `\n- Antigo Assinante: ${dados.reaproveitamento}`;
             }
@@ -554,26 +555,26 @@
         const resumoProjeto = `${dados.cidade} - ${dados.nome} - ${dados.id_os} - ${dados.modalidade} - ${metragemComReserva} MTS - ${dataAtual}`.toUpperCase();
         const resumoProcedimento = `${dados.id_os}	${dados.nome}	${dados.cidade}	${dados.bairro}	${dados.ce}	${dados.modalidade}	${dados.data_os}	${dataAtual}`.toUpperCase();
 
-        const template = `📋 ** PROJETO DE INSTALAÇÃO FTTH **
+        const template = `~ PROJETO DE INSTALAÇÃO FTTH ~
 Ordem de Serviço: ${dados.id_os} | Atendimento: ${dados.id_atendimento} | Data: ${dados.data_os} | Modalidade: ${dados.modalidade}
 
-👤 ** DADOS DO CLIENTE **
+~ DADOS DO CLIENTE ~
 Nome: ${dados.nome}
 Endereço: ${dados.endereco}, ${dados.numero}
 Localidade: ${dados.bairro} - ${dados.cidade}${condominioTxt}${complementoTxt}${observacoesTxt}
 
-🪜 ** DETALHES TÉCNICOS DE LANÇAMENTO **
+~ DETALHES TÉCNICOS DE LANÇAMENTO ~
 > LANÇAR CABO DROP ATÉ A CAIXA DESIGNADA CONFORME ROTA DEFINIDA NO MAPA EM ANEXO.
 - Metragem Estimada: ${dados.metragem} metros (Rota) + 40 metros (Reservas)
 - Ancoragens em Cordoalha: ${dados.cordoalha}
 - CE / Caixa de Atendimento: ${dados.ce}
 
-🧰 ** DETALHES TÉCNICOS DE ATIVAÇÃO **
+~ DETALHES TÉCNICOS DE ATIVAÇÃO ~
 > REALIZAR FUSÃO NA PORTA DESIGNADA CONFORME DIAGRAMA EM ANEXO E IDENTIFICAR O TUBETE.
 - Splitter: ${dados.splitter}
 - Porta Designada: ${dados.porta}
 
-🔗 ** COORDENADAS GEOGRÁFICAS **
+~ COORDENADAS GEOGRÁFICAS ~
 - Localização da Caixa: ${dados.coordenadas_os}
 - Localização do Cliente: ${dados.coordenadas_cliente}
 
