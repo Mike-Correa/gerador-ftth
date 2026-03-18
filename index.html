@@ -51,7 +51,7 @@
             padding: 25px;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            max-width: 1300px;
+            max-width: 1400px;
             width: 100%;
             transition: background-color 0.3s;
         }
@@ -134,7 +134,7 @@
         /* Grid Layouts do Cliente com alinhamento refinado */
         .grid-row-1 {
             display: grid;
-            grid-template-columns: 3.3fr 2.2fr 0.5fr;
+            grid-template-columns: 3.2fr 2.2fr 0.5fr;
             gap: 15px;
         }
 
@@ -234,7 +234,7 @@
 
         textarea {
             width: 100%;
-            height: 580px; 
+            height: 600px; 
             padding: 10px;
             border: 1px solid var(--border-color);
             border-radius: 4px;
@@ -351,10 +351,10 @@
                 <option value="" disabled selected hidden>Selecione...</option>
                 <option value="PROJETO AI">PROJETO AI</option>
                 <option value="PROJETO N1 > AI">PROJETO N1 > AI</option>
-                <option value="PROCEDIMENTO N1">PROCEDIMENTO N1</option>
-                <option value="PROCEDIMENTO N2">PROCEDIMENTO N2</option>
-                <option value="CORREÇÃO">CORREÇÃO</option>
-                <option value="READEQUAÇÃO">READEQUAÇÃO</option>
+                <option value="AMPLIAÇÃO N1">AMPLIAÇÃO N1</option>
+                <option value="AMPLIAÇÃO N2">AMPLIAÇÃO N2</option>
+                <option value="CORREÇÃO N1">CORREÇÃO N1</option>
+                <option value="READEQUAÇÃO N1">READEQUAÇÃO N1</option>
             </select>
         </div>
         <div class="form-group">
@@ -551,9 +551,22 @@
         const ano = String(hoje.getFullYear()); 
         const dataAtual = `${dia}/${mes}/${ano}`;
 
+        // Lógica para extrair apenas o texto após o primeiro espaço da Modalidade
+        let modalidadeCurta = dados.modalidade;
+        const indexEspaco = modalidadeCurta.indexOf(' ');
+        if (indexEspaco !== -1 && dados.modalidade !== '[Modalidade]') {
+            modalidadeCurta = modalidadeCurta.substring(indexEspaco + 1);
+        }
+
+        // Lógica para transformar "ID - Nome" em "ID \t Nome" para o resumoProcedimento
+        let nomeProcedimento = dados.nome;
+        if (nomeProcedimento.includes(' - ')) {
+            nomeProcedimento = nomeProcedimento.replace(' - ', '\t');
+        }
+
         // Construção das linhas de resumo
-        const resumoProjeto = `${dados.cidade} - ${dados.nome} - ${dados.id_os} - ${dados.modalidade} - ${metragemComReserva} MTS - ${dataAtual}`.toUpperCase();
-        const resumoProcedimento = `${dados.id_os}	${dados.nome}	${dados.cidade}	${dados.bairro}	${dados.ce}	${dados.modalidade}	${dados.data_os}	${dataAtual}`.toUpperCase();
+        const resumoProjeto = `${dados.cidade} - ${dados.nome} - ${dados.id_os} - ${modalidadeCurta} - ${metragemComReserva} MTS - ${dataAtual}`.toUpperCase();
+        const resumoProcedimento = `${dados.id_os}\t${nomeProcedimento}\t${dados.cidade}\t${dados.bairro}\t${dados.ce}\t${dados.modalidade}\t${dados.data_os}\t${dataAtual}`.toUpperCase();
 
         const template = `~ PROJETO DE INSTALAÇÃO FTTH ~
 Ordem de Serviço: ${dados.id_os} | Atendimento: ${dados.id_atendimento} | Data: ${dados.data_os} | Modalidade: ${dados.modalidade}
