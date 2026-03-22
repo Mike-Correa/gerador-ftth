@@ -106,8 +106,8 @@
             background-color: var(--input-bg);
             color: var(--text-color);
             font-family: inherit;
-            box-sizing: border-box; /* Garante que padding não aumente o tamanho */
-            height: 38px; /* Força a altura exata em todos os elementos */
+            box-sizing: border-box; 
+            height: 38px; 
             transition: border-color 0.3s, background-color 0.3s, color 0.3s;
         }
 
@@ -131,10 +131,10 @@
             color: var(--text-color);
         }
 
-        /* Grid Layouts do Cliente com alinhamento refinado */
+        /* Grid Layouts do Cliente atualizado */
         .grid-row-1 {
             display: grid;
-            grid-template-columns: 3.2fr 2.2fr 0.5fr;
+            grid-template-columns: 3.4fr 0.7fr 2.9fr 0.2fr; 
             gap: 15px;
         }
 
@@ -174,14 +174,14 @@
             position: relative;
             display: flex;
             align-items: center;
-            height: 38px; /* Ajustado para acompanhar o input */
+            height: 38px; 
         }
 
         .input-with-icon input[type="text"] {
             width: 100%;
             padding-right: 40px;
             box-sizing: border-box;
-            height: 100%; /* Herda os 38px */
+            height: 100%; 
         }
 
         .input-with-icon input[type="date"] {
@@ -222,10 +222,17 @@
             transition: transform 0.3s ease, color 0.3s;
         }
 
-        .input-with-icon .action-btn:hover {
+        .input-with-icon .action-btn:hover:not(:disabled) {
             color: var(--primary-hover);
             transform: rotate(180deg);
             background-color: transparent;
+        }
+
+        /* Estilo para quando o botão estiver inativo */
+        .input-with-icon .action-btn:disabled {
+            color: var(--placeholder-color);
+            cursor: not-allowed;
+            opacity: 0.5;
         }
 
         .output-section {
@@ -284,6 +291,13 @@
         <div class="form-group">
             <label for="nome">Nome do Cliente</label>
             <input type="text" id="nome" class="auto-update" placeholder="Ex: 37028 - John Smith">
+        </div>
+        <div class="form-group">
+            <label for="login">Login</label>
+            <div class="input-with-icon">
+                <input type="text" id="login" class="auto-update" placeholder="Ex: 123132">
+                <button type="button" id="btn_login" class="action-btn" title="Adicionar/Remover Login ao Nome" disabled>🔄</button>
+            </div>
         </div>
         <div class="form-group">
             <label for="endereco">Endereço</label>
@@ -421,6 +435,10 @@
     const inputReaproveitamento = document.getElementById('reaproveitamento');
     const btnLimpar = document.getElementById('btn_limpar');
 
+    const inputLogin = document.getElementById('login');
+    const btnLogin = document.getElementById('btn_login');
+    const inputNome = document.getElementById('nome');
+
     // Estado do placeholder de Reaproveitamento
     let stateReaproveitamento = 'Não';
 
@@ -448,14 +466,54 @@
                 stateReaproveitamento = dadosSalvos['stateReaproveitamento'];
                 inputReaproveitamento.placeholder = stateReaproveitamento;
             }
+            // Avalia estado do botão de login após carregar
+            if (inputLogin.value.trim() !== '') {
+                btnLogin.disabled = false;
+            }
+            // Avalia estado do botão de reaproveitamento após carregar
+            if (inputReaproveitamento.value.trim() !== '') {
+                btnReaproveitamento.disabled = true;
+            }
         }
     }
 
     // === LÓGICA DE INTERAÇÃO DOS CAMPOS ===
+    
+    // Reaproveitamento - Alternar Sim/Não e Bloqueio se houver texto
     btnReaproveitamento.addEventListener('click', function() {
         stateReaproveitamento = stateReaproveitamento === 'Não' ? 'Sim' : 'Não';
         inputReaproveitamento.placeholder = stateReaproveitamento;
         atualizarTexto();
+    });
+
+    inputReaproveitamento.addEventListener('input', function() {
+        btnReaproveitamento.disabled = this.value.trim() !== '';
+    });
+
+    // Toggle de Inclusão/Remoção do Login no Nome
+    inputLogin.addEventListener('input', function() {
+        btnLogin.disabled = this.value.trim() === '';
+    });
+
+    btnLogin.addEventListener('click', function() {
+        const loginVal = inputLogin.value.trim();
+        let nomeVal = inputNome.value.trim();
+        
+        if (loginVal !== '') {
+            const tagLogin = `(${loginVal})`;
+            
+            // Se o login já estiver no nome, ele remove
+            if (nomeVal.includes(tagLogin)) {
+                inputNome.value = nomeVal.replace(` ${tagLogin}`, '').replace(tagLogin, '').trim();
+            } 
+            // Caso contrário, adiciona no final
+            else {
+                inputNome.value = nomeVal ? `${nomeVal} ${tagLogin}` : tagLogin;
+            }
+            
+            atualizarTexto();
+            salvarDados(); 
+        }
     });
 
     dataPicker.addEventListener('change', function() {
@@ -473,6 +531,8 @@
         inputs.forEach(input => input.value = '');
         stateReaproveitamento = 'Não';
         inputReaproveitamento.placeholder = stateReaproveitamento;
+        btnLogin.disabled = true; // Restaura o botão de login como inativo
+        btnReaproveitamento.disabled = false; // Restaura o botão de reaproveitamento como ativo
         localStorage.removeItem(storageKey);
         atualizarTexto();
     });
